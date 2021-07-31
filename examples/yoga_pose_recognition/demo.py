@@ -1033,15 +1033,18 @@ def recognize_pose(r, expected_pose="mountain", track="beginners"):
             top_n_by_max_distance=30,
             top_n_by_mean_distance=10)
 
-        assert r.landmarks_abs.shape == (
-            33, 3), 'Unexpected landmarks shape: {}'.format(r.landmarks_abs.shape)
+        print(r.landmarks)
+        print(r.landmarks[KEYPOINT_DICT])
+
+        assert r.landmarks.shape == (
+            33, 3), 'Unexpected landmarks shape: {}'.format(r.landmarks.shape)
 
         # print(r.landmarks_abs)
         # print(type(r.landmarks_abs))
 
-        r.landmarks_abs = r.landmarks_abs.astype('float32')
+        r.landmarks = r.landmarks.astype('float32')
 
-        pose_classification = pose_classifier(r.landmarks_abs)
+        pose_classification = pose_classifier(r.landmarks)
 
         pose_classification_filter = EMADictSmoothing(
             window_size=10,
