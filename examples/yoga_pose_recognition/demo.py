@@ -994,7 +994,7 @@ semaphore_flag = {
         (1,6):'Y', (5,6):'Z',
 }
 
-def recognize_pose(r, expected_pose, track):
+def recognize_pose(r, expected_pose="mountain", track="beginners"):
 
         r.pose = "Pose not detected"
 
