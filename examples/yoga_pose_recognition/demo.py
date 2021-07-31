@@ -994,7 +994,7 @@ semaphore_flag = {
         (1,6):'Y', (5,6):'Z',
 }
 
-def recognize_pose(self, r, expected_pose, track):
+def recognize_pose(r, expected_pose, track):
 
         r.pose = "Pose not detected"
 
@@ -1267,27 +1267,6 @@ def recognize_pose(self, r, expected_pose, track):
             # print(f'FEEDBACK: {feedback}')
             # print("----------------------\n")
 
-
-def recognize_gesture(b):  
-    # b: body         
-
-    def angle_with_y(v):
-        # v: 2d vector (x,y)
-        # Returns angle in degree of v with y-axis of image plane
-        if v[1] == 0:
-            return 90
-        angle = atan2(v[0], v[1])
-        return degrees(angle)
-
-    # For the demo, we want to recognize the flag semaphore alphabet
-    # For this task, we just need to measure the angles of both arms with vertical
-    right_arm_angle = angle_with_y(b.landmarks[KEYPOINT_DICT['right_elbow'],:2] - b.landmarks[KEYPOINT_DICT['right_shoulder'],:2])
-    left_arm_angle = angle_with_y(b.landmarks[KEYPOINT_DICT['left_elbow'],:2] - b.landmarks[KEYPOINT_DICT['left_shoulder'],:2])
-    right_pose = int((right_arm_angle +202.5) / 45) % 8 
-    left_pose = int((left_arm_angle +202.5) / 45) % 8
-    letter = semaphore_flag.get((right_pose, left_pose), None)
-    return letter
-
 parser = argparse.ArgumentParser()
 parser.add_argument("-m", "--model", type=str, choices=['full', 'lite', '831'], default='full',
                         help="Landmark model to use (default=%(default)s")
@@ -1295,10 +1274,16 @@ parser.add_argument('-i', '--input', type=str, default='rgb',
                     help="'rgb' or 'rgb_laconic' or path to video/image file to use as input (default: %(default)s)")  
 parser.add_argument("-o","--output",
                     help="Path to output video file")
+parser.add_argument('-ep', '--expected_pose', type=str,
+                    help="enable pose recognition")
+parser.add_argument('-tr', '--track', type=str,
+                    help="select specific track")
 args = parser.parse_args()            
 
 pose = BlazeposeDepthai(input_src=args.input, lm_model=args.model)
 renderer = BlazeposeRenderer(pose, output=args.output)
+expected_pose = args.expected_pose
+track = args.track
 
 while True:
     # Run blazepose on next frame
@@ -1308,7 +1293,7 @@ while True:
     frame = renderer.draw(frame, body)
     # Gesture recognition
     if body: 
-        letter = recognize_gesture(body)
+        pose = recognize_pose(body,expected_pose, track)
         if letter:
             cv2.putText(frame, letter, (frame.shape[1] // 2, 100), cv2.FONT_HERSHEY_PLAIN, 5, (0,190,255), 3)
     key = renderer.waitKey(delay=1)
