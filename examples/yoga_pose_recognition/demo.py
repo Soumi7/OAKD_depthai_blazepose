@@ -1034,7 +1034,7 @@ def recognize_pose(r, expected_pose="mountain", track="beginners"):
             top_n_by_mean_distance=10)
 
         print(r.landmarks)
-        print(r.landmarks[KEYPOINT_DICT])
+        print(r.landmarks[0])
 
         assert r.landmarks.shape == (
             33, 3), 'Unexpected landmarks shape: {}'.format(r.landmarks.shape)
@@ -1111,27 +1111,27 @@ def recognize_pose(r, expected_pose="mountain", track="beginners"):
             return np.degrees(angle)
 
         LEFT_ARM_ANGLE = get3DAngle(
-            r.landmarks_abs[12, :3], r.landmarks_abs[14, :3], r.landmarks_abs[16, :3])
+            r.landmarks[12, :3], r.landmarks[14, :3], r.landmarks[16, :3])
         RIGHT_ARM_ANGLE = get3DAngle(
-            r.landmarks_abs[11, :3], r.landmarks_abs[13, :3], r.landmarks_abs[15, :3])
+            r.landmarks[11, :3], r.landmarks[13, :3], r.landmarks[15, :3])
 
         LEFT_HAND_HIP_ANGLE = get3DAngle(
-            r.landmarks_abs[14, :3], r.landmarks_abs[12, :3], r.landmarks_abs[24, :3])
+            r.landmarks[14, :3], r.landmarks[12, :3], r.landmarks[24, :3])
         RIGHT_HAND_HIP_ANGLE = get3DAngle(
-            r.landmarks_abs[13, :3], r.landmarks_abs[21, :3], r.landmarks_abs[23, :3])
+            r.landmarks[13, :3], r.landmarks[21, :3], r.landmarks[23, :3])
 
         LEFT_LEG_ANGLE = get3DAngle(
-            r.landmarks_abs[24, :3], r.landmarks_abs[26, :3], r.landmarks_abs[28, :3])
+            r.landmarks[24, :3], r.landmarks[26, :3], r.landmarks[28, :3])
         RIGHT_LEG_ANGLE = get3DAngle(
-            r.landmarks_abs[23, :3], r.landmarks_abs[25, :3], r.landmarks_abs[27, :3])
+            r.landmarks[23, :3], r.landmarks[25, :3], r.landmarks[27, :3])
 
         LEFT_HIP_KNEE_ANGLE = get3DAngle(
-            r.landmarks_abs[12, :3], r.landmarks_abs[24, :3], r.landmarks_abs[26, :3])
+            r.landmarks[12, :3], r.landmarks[24, :3], r.landmarks[26, :3])
         RIGHT_HIP_KNEE_ANGLE = get3DAngle(
-            r.landmarks_abs[11, :3], r.landmarks_abs[23, :3], r.landmarks_abs[25, :3])
+            r.landmarks[11, :3], r.landmarks[23, :3], r.landmarks[25, :3])
 
         ANGLE_BETWEEN_LEGS = get3DAngle(
-            r.landmarks_abs[26, :3], r.landmarks_abs[0, :3], r.landmarks_abs[25, :3])
+            r.landmarks[26, :3], r.landmarks[0, :3], r.landmarks[25, :3])
 
         # print("LEFT_ARM_ANGLE",LEFT_ARM_ANGLE)
         # print("RIGHT_ARM_ANGLE",RIGHT_ARM_ANGLE)
