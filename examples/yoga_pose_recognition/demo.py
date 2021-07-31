@@ -6,6 +6,7 @@ from BlazeposeDepthaiEdge import BlazeposeDepthai
 from BlazeposeRenderer import BlazeposeRenderer
 from mediapipe_utils import KEYPOINT_DICT
 import argparse
+import numpy as np
 
 import argparse
 import csv
