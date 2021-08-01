@@ -1279,9 +1279,9 @@ def recognize_pose(r, expected_pose="mountain", track="beginners"):
             # print("----------------------\n")
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-m", "--model", type=str, choices=['full', 'lite', '831'], default='full',
+parser.add_argument("-m", "--model", type=str, choices=['full', 'lite', '831'], default='lite',
                         help="Landmark model to use (default=%(default)s")
-parser.add_argument('-i', '--input', type=str, default='rgb',
+parser.add_argument('-i', '--input', type=str, default='rgb_laconic',
                     help="'rgb' or 'rgb_laconic' or path to video/image file to use as input (default: %(default)s)")  
 parser.add_argument("-o","--output",
                     help="Path to output video file")
