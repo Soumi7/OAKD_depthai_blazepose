@@ -1,18 +1,16 @@
 # Blazepose tracking with DepthAI
 
-Running Google Mediapipe single body pose tracking models on [DepthAI](https://docs.luxonis.com/en/gen2/) hardware (OAK-1, OAK-D, ...). 
+We will perform pose classification on video input from OpenCV AI Kit with Depth sensor.(OAK-D)
+
+The model used for 3D body joint keypoints detection is Google's mediapipe and [DepthAI](https://docs.luxonis.com/en/gen2/).
+
+We use the keypoints for pose classification into several yoga pose categories like tadasana(mountain pose), bhujangasa (cobra pose), salabhasana (locust pose), etc.
 
 The Blazepose landmark models available in this repository are the version "full", "lite" and "heavy" of mediapipe 0.8.6 (2021/07),
 
-The pose detection model comes from mediapipe 0.8.4 and is compatible with the 3 landmark models (the 0.8.6 version currently cannot be converted into a Myriad blob).
-
+The pose detection model comes from mediapipe 0.8.4 and is compatible with the 3 landmark models.
 
 ![Demo](img/taichi.gif)
-
-For the challenger Movenet on DepthAI, please visit : [depthai_movenet](https://github.com/geaxgx/depthai_movenet)
-
-For an OpenVINO version of Blazepose, please visit : [openvino_blazepose](https://github.com/geaxgx/openvino_blazepose)
-
 
 
 ## Architecture: Host mode vs Edge mode
@@ -31,8 +29,6 @@ Two modes are available:
 ![Edge mode](img/pipeline_edge_mode.png)
 
 For depth-capable devices, when measuring the 3D location of a reference point, more nodes are used and not represented here (2 mono cameras, stereo node, spatial location calculator).
-
-*Note : the Edge mode schema is missing a custom NeuralNetwork node between the ImageManip node on the right and the landmark NeuralNetwork. This custom NeuralNetwork runs a very simple model that normalize (divide by 255) the output image from the ImageManip node. This is a temporary fix, should be removed when depthai ImageManip node will support setFrameType(RGBF16F16F16p).*
 
 ## Inferred 3D vs Measured 3D
 
@@ -213,8 +209,6 @@ The `custom_models` directory contains the code to build the following custom mo
 The method used to build these models is well explained on the [rahulrav's blog](https://rahulrav.com/blog/depthai_camera.html).
 
 
-
-
 ## Code
 
 To facilitate reusability, the code is splitted in 2 classes:
@@ -272,14 +266,54 @@ For more information on:
 - the arguments of the tracker, please refer to the docstring of class `BlazeposeDepthai` or `BlazeposeDepthaiEdge` in `BlazeposeDepthai.py` or `BlazeposeDepthaiEdge.py`;
 - the attributes of the 'body' element you can exploit in your program, please refer to the doctring of class `Body` in `mediapipe_utils.py`.
 
-## Examples
+-- **yoga_pose_recognizer.py** - 
+    - ```predicted_pose = recognize_pose(body,
+                                    expected_pose,
+                                    track)
+        ```
+    - We have a loop which runs till "q" is pressed, gives us the next frame
+    - We get result from device - Marshall
+    - We get video input nd extract frame
+    - If landmark score of result > threshold, we initialise a new mpu.Body object as ```body```.
+    - We store all the attributes like body rotation, landmark score.
+    - Then landmark post process.
+    - body.xyz : center of hips
+    - BlazeposeDepthAIEdge.nextframe returns the video frame and body
+    - Now we send body and expected pose and track arguments as input to recignize pose function.
+    - First we initialise the pose string
+    - We define a full body pose embedder object - ```pose_embedder```
+    - We initialize the pose folder based on the track
+    - We define a Pose Classifier - ```pose_classifier``` 
+        ```pose_classifier = PoseClassifier(
+            pose_samples_folder=pose_folder,
+            pose_embedder=pose_embedder,
+            top_n_by_max_distance=30,
+            top_n_by_mean_distance=10)
+        ```
+    - We have 33 joint points with x y z coordinates.
+    - We get the body joint landmark x, y and z coordinates using body.landmarks.
+    - pose_classification = pose_classifier(r.landmarks)
+    - ```pose_classification_filter = EMADictSmoothing(
+            window_size=10,
+            alpha=0.2)
 
-|||
-|-|-|
-|[Semaphore alphabet](examples/semaphore_alphabet)  |<img src="examples/semaphore_alphabet/medias/semaphore.gif" alt="Sempahore alphabet" width="200"/>|
+        # Smooth classification using EMA.
+        pose_classification_filtered = pose_classification_filter(
+            pose_classification)
+        ```
+    - We use get_3D_Angle function to use x,y,z coordinates of three joint keypoints and calculate angle between two vectors in three dimensional space.
+    - We get 7 different angles values for this video frame
+    - This is to calculate feedback for each frame
+    - we initialise pose angles to the pose angles we expect
+    - We calculate the differences of this specific frames's pose angles with expected pose angles.
+    - We only consider the top 2 joint angles with max absolute difference.
+    - We only print feedback, pose name and accuracy if predicted pose = expected pose.
+    - accuarcy calculating using weighted average of top 10 classes and pose angle differences
+
 
 ## Credits
 * [Google Mediapipe](https://github.com/google/mediapipe)
 * Katsuya Hyodo a.k.a [Pinto](https://github.com/PINTO0309), the Wizard of Model Conversion !
 * [Tai Chi Step by Step For Beginners Training Session 4](https://www.youtube.com/watch?v=oawZ_7wNWrU&ab_channel=MasterSongKungFu)
 * [Semaphore with The RCR Museum](https://www.youtube.com/watch?v=DezaTjQYPh0&ab_channel=TheRoyalCanadianRegimentMuseum)
+* Movenet on DepthAI, please visit : [depthai_movenet](https://github.com/geaxgx/depthai_movenet)
