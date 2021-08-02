@@ -14,6 +14,7 @@ import os
 from math import acos, atan2
 from pathlib import Path
 
+# POSES : Dictionary containing expected angle values for each pose.
 
 POSES = {
     "mountain": {
@@ -990,18 +991,6 @@ LINE_MESH_UPPER_BODY = [[9, 10], [4, 6], [1, 3],
                         [11, 13], [13, 15], [15, 19], [19, 17], [17, 15]
                         ]
 
-
-# For gesture demo
-semaphore_flag = {
-        (3,4):'A', (2,4):'B', (1,4):'C', (0,4):'D',
-        (4,7):'E', (4,6):'F', (4,5):'G', (2,3):'H',
-        (0,3):'I', (0,6):'J', (3,0):'K', (3,7):'L',
-        (3,6):'M', (3,5):'N', (2,1):'O', (2,0):'P',
-        (2,7):'Q', (2,6):'R', (2,5):'S', (1,0):'T',
-        (1,7):'U', (0,5):'V', (7,6):'W', (7,5):'X',
-        (1,6):'Y', (5,6):'Z',
-}
-
 def recognize_pose(r, expected_pose="mountain", track="beginners"):
 
         r.pose = "Pose not detected"
@@ -1302,7 +1291,7 @@ while True:
     if frame is None: break
     # Draw 2d skeleton
     frame = renderer.draw(frame, body)
-    # Gesture recognition
+    # Pose recognition
     if body: 
         predicted_pose = recognize_pose(body,expected_pose, track)
         if predicted_pose:
