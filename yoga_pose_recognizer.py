@@ -1284,21 +1284,24 @@ pose = BlazeposeDepthai(input_src=args.input, lm_model=args.model)
 renderer = BlazeposeRenderer(pose, output=args.output)
 expected_pose = args.expected_pose
 track = args.track
+import keyboard
 
 while True:
     # Run blazepose on next frame
     frame, body = pose.next_frame()
     if frame is None: break
     # Draw 2d skeleton
-    frame = renderer.draw(frame, body)
+    #frame = renderer.draw(frame, body)
     # Pose recognition
     if body: 
         predicted_pose = recognize_pose(body,expected_pose, track)
-        if predicted_pose:
-            cv2.putText(frame, predicted_pose, (frame.shape[1] // 2, 100), cv2.FONT_HERSHEY_PLAIN, 5, (0,190,255), 3)
-    key = renderer.waitKey(delay=1)
-    if key == 27 or key == ord('q'):
+        # if predicted_pose:
+        #     cv2.putText(frame, predicted_pose, (frame.shape[1] // 2, 100), cv2.FONT_HERSHEY_PLAIN, 5, (0,190,255), 3)
+    # key = renderer.waitKey(delay=1)
+    # if key == 27 or key == ord('q'):
+    #     break
+    if keyboard.is_pressed('q'):
         break
-renderer.exit()
+#renderer.exit()
 pose.exit()
 
