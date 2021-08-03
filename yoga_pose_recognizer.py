@@ -1284,7 +1284,6 @@ pose = BlazeposeDepthai(input_src=args.input, lm_model=args.model)
 renderer = BlazeposeRenderer(pose, output=args.output)
 expected_pose = args.expected_pose
 track = args.track
-import keyboard
 
 while True:
     # Run blazepose on next frame
@@ -1300,8 +1299,6 @@ while True:
     # key = renderer.waitKey(delay=1)
     # if key == 27 or key == ord('q'):
     #     break
-    if keyboard.is_pressed('q'):
-        break
 #renderer.exit()
 pose.exit()
 
