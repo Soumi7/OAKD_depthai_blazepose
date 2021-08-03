@@ -267,10 +267,11 @@ For more information on:
 - the attributes of the 'body' element you can exploit in your program, please refer to the doctring of class `Body` in `mediapipe_utils.py`.
 
 - **yoga_pose_recognizer.py** - 
-    - ```predicted_pose = recognize_pose(body,
+    - ```
+    predicted_pose = recognize_pose(body,
                                     expected_pose,
                                     track)
-        ```
+    ```
     - We have a loop which runs till "q" is pressed, gives us the next frame
     - We get result from device - Marshall
     - We get video input nd extract frame
@@ -284,31 +285,37 @@ For more information on:
     - We define a full body pose embedder object - ```pose_embedder```
     - We initialize the pose folder based on the track
     - We define a Pose Classifier - ```pose_classifier``` 
-        ```pose_classifier = PoseClassifier(
+        ```
+        pose_classifier = PoseClassifier(
             pose_samples_folder=pose_folder,
             pose_embedder=pose_embedder,
             top_n_by_max_distance=30,
             top_n_by_mean_distance=10)
         ```
     - We have 33 joint points with x y z coordinates.
+    - ![img](https://github.com/Soumi7/OAKD_depthai_blazepose/blob/main/landmarks-fixed.png)
     - We get the body joint landmark x, y and z coordinates using body.landmarks.
     - pose_classification = pose_classifier(r.landmarks)
-    - ```pose_classification_filter = EMADictSmoothing(
+    - ```
+    pose_classification_filter = EMADictSmoothing(
             window_size=10,
             alpha=0.2)
 
         # Smooth classification using EMA.
         pose_classification_filtered = pose_classification_filter(
             pose_classification)
-        ```
-    - We use get_3D_Angle function to use x,y,z coordinates of three joint keypoints and calculate angle between two vectors in three dimensional space.
-    - We get 7 different angles values for this video frame
+    ```
+    - We use get_3D_Angle() function to use x,y,z coordinates of three joint keypoints and calculate angle between two vectors in three dimensional space.
+    - We get 7 different angles values for this video frame. For examples, this is the left arm angle with joints as left shoulder, left elbow and left wrist.
+    ```LEFT_ARM_ANGLE = get3DAngle(
+            r.landmarks[12, :3], r.landmarks[14, :3], r.landmarks[16, :3])
+    ```
     - This is to calculate feedback for each frame
-    - we initialise pose angles to the pose angles we expect
+    - We initialise pose angles to the pose angles we expect
     - We calculate the differences of this specific frames's pose angles with expected pose angles.
     - We only consider the top 2 joint angles with max absolute difference.
-    - We only print feedback, pose name and accuracy if predicted pose = expected pose.
-    - accuarcy calculating using weighted average of top 10 classes and pose angle differences
+    - We only print feedback, pose name and accuracy if predicted pose is equal to expected pose.
+    - Accuracy is calculated using weighted average of top 10 classes and pose angle differences.
 
 
 ## Credits
@@ -317,3 +324,9 @@ For more information on:
 * [Tai Chi Step by Step For Beginners Training Session 4](https://www.youtube.com/watch?v=oawZ_7wNWrU&ab_channel=MasterSongKungFu)
 * [Semaphore with The RCR Museum](https://www.youtube.com/watch?v=DezaTjQYPh0&ab_channel=TheRoyalCanadianRegimentMuseum)
 * Movenet on DepthAI, please visit : [depthai_movenet](https://github.com/geaxgx/depthai_movenet)
+* [On Device Real Time Body Pose Tracking](https://ai.googleblog.com/2020/08/on-device-real-time-body-pose-tracking.html)
+
+## Authors
+* [Soumi7](https://github.com/Soumi7/)
+* [sbis04](https://github.com/sbis04/)
+* [geaxgx](https://github.com/geaxgx/)
