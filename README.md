@@ -296,7 +296,8 @@ For more information on:
     - ![img](https://github.com/Soumi7/OAKD_depthai_blazepose/blob/main/landmarks-fixed.png)
     - We get the body joint landmark x, y and z coordinates using body.landmarks.
     - pose_classification = pose_classifier(r.landmarks)
-    - ```
+    - 
+    ```
     pose_classification_filter = EMADictSmoothing(
             window_size=10,
             alpha=0.2)
@@ -307,7 +308,8 @@ For more information on:
     ```
     - We use get_3D_Angle() function to use x,y,z coordinates of three joint keypoints and calculate angle between two vectors in three dimensional space.
     - We get 7 different angles values for this video frame. For examples, this is the left arm angle with joints as left shoulder, left elbow and left wrist.
-    ```LEFT_ARM_ANGLE = get3DAngle(
+    ```
+    LEFT_ARM_ANGLE = get3DAngle(
             r.landmarks[12, :3], r.landmarks[14, :3], r.landmarks[16, :3])
     ```
     - This is to calculate feedback for each frame
