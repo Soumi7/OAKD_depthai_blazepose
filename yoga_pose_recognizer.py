@@ -1022,8 +1022,7 @@ def recognize_pose(r, expected_pose="mountain", track="beginners"):
             top_n_by_max_distance=30,
             top_n_by_mean_distance=10)
 
-        #print(r.landmarks)
-        
+        #print(r.landmarks)        
 
         assert r.landmarks.shape == (
             33, 3), 'Unexpected landmarks shape: {}'.format(r.landmarks.shape)

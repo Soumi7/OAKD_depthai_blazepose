@@ -316,6 +316,72 @@ For more information on:
     - We only consider the top 2 joint angles with max absolute difference.
     - We only print feedback, pose name and accuracy if predicted pose is equal to expected pose.
     - Accuracy is calculated using weighted average of top 10 classes and pose angle differences.
+- FullBodyPoseEmbedder - Converts 3D pose landmarks into 3D embedding.
+    - _normalize_pose_landmarks - Normalizes landmarks translation and scale.
+        - _get_pose_center - Calculates pose center as point between hips.
+        - _get_pose_size 
+            - Calculates pose size.
+            It is the maximum of two values:
+                - Torso size multiplied by `torso_size_multiplier`
+                - Maximum distance from pose center to any pose landmark.
+            - _get_pose_center
+        
+    - _get_pose_distance_embedding 
+        Converts pose landmarks into 3D embedding.
+
+        We use several pairwise 3D distances to form pose embedding. All distances
+        include X and Y components with sign. We differnt types of pairs to cover
+        different pose classes. Feel free to remove some or add new.
+
+        Args:
+        landmarks - NumPy array with 3D landmarks of shape (N, 3).
+
+        Result:
+        Numpy array with pose embedding of shape (M, 3) where `M` is the number of
+        pairwise distances.
+    - 
+- Pose Sample Class
+- Pose Classifier - Classifies pose landmarks.
+    - _load_pose_samples
+    Classifies given pose.
+
+    Classification is done in two stages:
+      * First we pick top-N samples by MAX distance. It allows to remove samples
+        that are almost the same as given pose, but has few joints bent in the
+        other direction.
+      * Then we pick top-N samples by MEAN distance. After outliers are removed
+        on a previous step, we can pick samples that are closes on average.
+
+    Args:
+      pose_landmarks: NumPy array with 3D landmarks of shape (N, 3).
+
+    Returns:
+      Dictionary with count of nearest pose samples from the database. Sample:
+      ```{
+          'pushups_down': 8,
+          'pushups_up': 2,
+        }
+- EMADictSmoothing
+    Smoothes given pose classification.
+
+        Smoothing is done by computing Exponential Moving Average for every pose
+        class observed in the given time window. Missed pose classes arre replaced
+        with 0.
+
+        Args:
+        data: Dictionary with pose classification. Sample:
+            {
+                'pushups_down': 8,
+                'pushups_up': 2,
+            }
+
+        Result:
+        Dictionary in the same format but with smoothed and float instead of
+        integer values. Sample:
+            {
+            'pushups_down': 8.3,
+            'pushups_up': 1.7,
+            } 
 
 
 ## Credits
