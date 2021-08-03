@@ -267,7 +267,8 @@ For more information on:
 - the attributes of the 'body' element you can exploit in your program, please refer to the doctring of class `Body` in `mediapipe_utils.py`.
 
 - **yoga_pose_recognizer.py** - 
-    - ```
+    - 
+    ```
     predicted_pose = recognize_pose(body,
                                     expected_pose,
                                     track)
