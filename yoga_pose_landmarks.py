@@ -153,7 +153,7 @@ class FullBodyPoseEmbedder(object):
         # Normalize scale.
         pose_size = self._get_pose_size(landmarks, self._torso_size_multiplier)
         landmarks /= pose_size
-        # Multiplication by 100 is not required, but makes it eaasier to debug.
+        # Multiplication by 100 is not required, but makes it easier to debug.
         landmarks *= 100
 
         return landmarks
@@ -512,12 +512,14 @@ def recognize_pose(r):
             33, 3), 'Unexpected landmarks shape: {}'.format(r.landmarks.shape)
 
         r.landmarks = r.landmarks.astype('float32')
-        each_point = "{"
+        keypoint_json = "{\'landmarks\':["
+
         for key in KEYPOINT_DICT.keys():
                 coord = r.landmarks[KEYPOINT_DICT[key]]
-                each_point+= f'\'{key}\':\{{\'x\':\'{coord[0]}\',\'y\':{coord[1]}}},'    
-        each_point+='}'
-        print(each_point)
+                keypoint_json+= f'{{\'name\':\'{key}\',\'x\':{coord[0]},\'y\':{coord[1]}}},'  
+
+        keypoint_json = keypoint_json[:-1] + ']}'
+        print(f'LANDMARKS: {keypoint_json}')
 
         #data = {"pose": pose, "accuracy": rounded_accuracy, "feedback": feedback}
         #print(f"RECOGNIZED: {data}")
