@@ -507,7 +507,7 @@ LINE_MESH_UPPER_BODY = [[9, 10], [4, 6], [1, 3],
                         [11, 13], [13, 15], [15, 19], [19, 17], [17, 15]
                         ]
 
-def recognize_pose(r):
+def recognize_pose(pose,r):
         assert r.landmarks.shape == (
             33, 3), 'Unexpected landmarks shape: {}'.format(r.landmarks.shape)
 
