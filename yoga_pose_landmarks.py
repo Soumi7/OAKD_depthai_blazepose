@@ -11,6 +11,7 @@ import csv
 import os
 from math import acos, atan2
 from pathlib import Path
+from BlazeposeDepthaiEdge import BlazeposeDepthai
 
 def recognize_pose(r):
 
@@ -24,6 +25,7 @@ parser.add_argument('-i', '--input', type=str, default='rgb_laconic',
 parser.add_argument("-o","--output",
                     help="Path to output video file")
 args = parser.parse_args()            
+pose = BlazeposeDepthai(input_src=args.input, lm_model=args.model)
 
 while True:
     # Run blazepose on next frame
