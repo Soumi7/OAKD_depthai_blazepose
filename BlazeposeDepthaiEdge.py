@@ -508,6 +508,8 @@ class BlazeposeDepthai:
 
         else:
             body = None
+            body = mpu.Body()
+            body.lm_score = res["lm_score"]
             if self.smoothing: 
                 self.filter_landmarks.reset()
                 self.filter_landmarks_aux.reset()

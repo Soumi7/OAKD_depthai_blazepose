@@ -507,22 +507,24 @@ LINE_MESH_UPPER_BODY = [[9, 10], [4, 6], [1, 3],
                         [11, 13], [13, 15], [15, 19], [19, 17], [17, 15]
                         ]
 
-def recognize_pose(pose,r):
-        assert r.landmarks.shape == (
-            33, 3), 'Unexpected landmarks shape: {}'.format(r.landmarks.shape)
+def recognize_pose(r):
 
-        r.landmarks = r.landmarks.astype('float32')
-        keypoint_json = "{\'landmarks\':["
+        if (r.lm_score) > 0.8:
+            assert r.landmarks.shape == (
+                33, 3), 'Unexpected landmarks shape: {}'.format(r.landmarks.shape)
 
-        for key in KEYPOINT_DICT.keys():
-                coord = r.landmarks[KEYPOINT_DICT[key]]
-                keypoint_json+= f'{{\'name\':\'{key}\',\'x\':{coord[0]},\'y\':{coord[1]}}},'  
+            r.landmarks = r.landmarks.astype('float32')
+            keypoint_json = "{\'landmarks\':["
 
-        keypoint_json = keypoint_json[:-1] + ']}'
-        print(f'LANDMARKS: {keypoint_json}')
+            for key in KEYPOINT_DICT.keys():
+                    coord = r.landmarks[KEYPOINT_DICT[key]]
+                    keypoint_json+= f'{{\'name\':\'{key}\',\'x\':{coord[0]},\'y\':{coord[1]}}},'  
 
-        #data = {"pose": pose, "accuracy": rounded_accuracy, "feedback": feedback}
-        #print(f"RECOGNIZED: {data}")
+            keypoint_json = keypoint_json[:-1] + ']}'
+            print(f'LANDMARKS: {keypoint_json}')
+        else:
+            keypoint_json = "{\'landmarks\':[]}"
+            print(f'LANDMARKS: {keypoint_json}')
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-m", "--model", type=str, choices=['full', 'lite', '831'], default='lite',
