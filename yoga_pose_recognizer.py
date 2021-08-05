@@ -1292,7 +1292,8 @@ while True:
     #frame = renderer.draw(frame, body)
     # Pose recognition
     if body: 
-        predicted_pose = recognize_pose(body,expected_pose, track)
+        if body.lm_score > 0.7:
+            predicted_pose = recognize_pose(body,expected_pose, track)
         # if predicted_pose:
         #     cv2.putText(frame, predicted_pose, (frame.shape[1] // 2, 100), cv2.FONT_HERSHEY_PLAIN, 5, (0,190,255), 3)
     # key = renderer.waitKey(delay=1)
