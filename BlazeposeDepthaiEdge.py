@@ -77,7 +77,7 @@ class BlazeposeDepthai:
         self.pd_model = pd_model if pd_model else POSE_DETECTION_MODEL
         self.pp_model = pp_model if pd_model else DETECTION_POSTPROCESSING_MODEL
         self.divide_by_255_model = DIVIDE_BY_255_MODEL
-        print(f"Pose detection blob file : {self.pd_model}")
+        # print(f"Pose detection blob file : {self.pd_model}")
         self.rect_transf_scale = 1.25
         if lm_model is None or lm_model == "full":
             self.lm_model = LANDMARK_MODEL_FULL
@@ -87,7 +87,7 @@ class BlazeposeDepthai:
             self.lm_model = LANDMARK_MODEL_HEAVY
         else:
             self.lm_model = lm_model
-        print(f"Landmarks using blob file : {self.lm_model}")
+        # print(f"Landmarks using blob file : {self.lm_model}")
 
         self.pd_score_thresh = pd_score_thresh
         self.lm_score_thresh = lm_score_thresh
@@ -126,7 +126,7 @@ class BlazeposeDepthai:
                     self.internal_fps = 22 if self.xyz else 26
             else:
                 self.internal_fps = internal_fps
-            print(f"Internal camera FPS set to: {self.internal_fps}")
+            # print(f"Internal camera FPS set to: {self.internal_fps}")
 
             self.video_fps = self.internal_fps # Used when saving the output in a video file. Should be close to the real fps
             
@@ -145,7 +145,7 @@ class BlazeposeDepthai:
                 self.frame_size = self.img_w
                 self.crop_w = 0
 
-            print(f"Internal camera image size: {self.img_w} x {self.img_h} - pad_h: {self.pad_h}")
+            # print(f"Internal camera image size: {self.img_w} x {self.img_h} - pad_h: {self.pad_h}")
 
         else:
             print("Invalid input source:", input_src)
@@ -180,7 +180,7 @@ class BlazeposeDepthai:
         # Define and start pipeline
         usb_speed = self.device.getUsbSpeed()
         self.device.startPipeline(self.create_pipeline())
-        print(f"Pipeline started - USB speed: {str(usb_speed).split('.')[-1]}")
+        # print(f"Pipeline started - USB speed: {str(usb_speed).split('.')[-1]}")
 
         # Define data queues 
         if not self.laconic:
@@ -198,7 +198,7 @@ class BlazeposeDepthai:
         self.nb_frames_no_body = 0
 
     def create_pipeline(self):
-        print("Creating pipeline...")
+        print("INFO: Creating pipeline...")
         # Start defining a pipeline
         pipeline = dai.Pipeline()
         pipeline.setOpenVINOVersion(dai.OpenVINO.Version.VERSION_2021_4)
@@ -206,7 +206,7 @@ class BlazeposeDepthai:
         self.lm_input_length = 256
 
         # ColorCamera
-        print("Creating Color Camera...")
+        print("INFO: Creating Color Camera...")
         cam = pipeline.create(dai.node.ColorCamera) 
         cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
         cam.setInterleaved(False)
@@ -234,7 +234,7 @@ class BlazeposeDepthai:
         manager_script.setScript(self.build_manager_script())
 
         if self.xyz:
-            print("Creating MonoCameras, Stereo and SpatialLocationCalculator nodes...")
+            print("INFO: Creating MonoCameras, Stereo and SpatialLocationCalculator nodes...")
             # For now, RGB needs fixed focus to properly align with depth.
             # This value was used during calibration
             cam.initialControl.setManualFocus(130)
@@ -274,7 +274,7 @@ class BlazeposeDepthai:
             spatial_location_calculator.out.link(manager_script.inputs['spatial_data'])
 
         # Define pose detection pre processing (resize preview to (self.pd_input_length, self.pd_input_length))
-        print("Creating Pose Detection pre processing image manip...")
+        print("INFO: Creating Pose Detection pre processing image manip...")
         pre_pd_manip = pipeline.create(dai.node.ImageManip)
         pre_pd_manip.setMaxOutputFrameSize(self.pd_input_length*self.pd_input_length*3)
         pre_pd_manip.setWaitForConfigInput(True)
@@ -289,7 +289,7 @@ class BlazeposeDepthai:
         # pre_pd_manip.out.link(pre_pd_manip_out.input)
 
         # Define pose detection model
-        print("Creating Pose Detection Neural Network...")
+        print("INFO: Creating Pose Detection Neural Network...")
         pd_nn = pipeline.create(dai.node.NeuralNetwork)
         pd_nn.setBlobPath(self.pd_model)
         # Increase threads for detection
@@ -297,7 +297,7 @@ class BlazeposeDepthai:
         pre_pd_manip.out.link(pd_nn.input)
        
         # Define pose detection post processing "model"
-        print("Creating Pose Detection post processing Neural Network...")
+        print("INFO: Creating Pose Detection post processing Neural Network...")
         post_pd_nn = pipeline.create(dai.node.NeuralNetwork)
         post_pd_nn.setBlobPath(self.pp_model)
         pd_nn.out.link(post_pd_nn.input)
@@ -309,7 +309,7 @@ class BlazeposeDepthai:
         manager_script.outputs['host'].link(manager_out.input)
 
         # Define landmark pre processing image manip
-        print("Creating Landmark pre processing image manip...") 
+        print("INFO: Creating Landmark pre processing image manip...") 
         pre_lm_manip = pipeline.create(dai.node.ImageManip)
         pre_lm_manip.setMaxOutputFrameSize(self.lm_input_length*self.lm_input_length*3)
         pre_lm_manip.setWaitForConfigInput(True)
@@ -326,13 +326,13 @@ class BlazeposeDepthai:
 
         # Define normalization model between ImageManip and landmark model
         # This is a temporary step. Could be removed when support of setFrameType(RGBF16F16F16p) in ImageManip node
-        print("Creating DiveideBy255 Neural Network...") 
+        print("INFO: Creating DiveideBy255 Neural Network...") 
         divide_nn = pipeline.create(dai.node.NeuralNetwork)
         divide_nn.setBlobPath(self.divide_by_255_model)
         pre_lm_manip.out.link(divide_nn.input) 
 
         # Define landmark model
-        print("Creating Landmark Neural Network...") 
+        print("INFO: Creating Landmark Neural Network...") 
         lm_nn = pipeline.create(dai.node.NeuralNetwork)
         lm_nn.setBlobPath(self.lm_model)
         # lm_nn.setNumInferenceThreads(1)
@@ -340,7 +340,8 @@ class BlazeposeDepthai:
         divide_nn.out.link(lm_nn.input)       
         lm_nn.out.link(manager_script.inputs['from_lm_nn'])
 
-        print("Pipeline created.")
+        print("INFO: Pipeline created")
+        print("INFO: Ready")
 
         return pipeline        
 
@@ -535,11 +536,11 @@ class BlazeposeDepthai:
     def exit(self):
         self.device.close()
         # Print some stats
-        if self.stats:
-            print(f"FPS : {self.fps.get_global():.1f} f/s (# frames = {self.fps.nbf})")
-            print(f"# frames without body       : {self.nb_frames_no_body}")
-            print(f"# pose detection inferences : {self.nb_pd_inferences}")
-            print(f"# landmark inferences       : {self.nb_lm_inferences} - # after pose detection: {self.nb_lm_inferences - self.nb_lm_inferences_after_landmarks_ROI} - # after landmarks ROI prediction: {self.nb_lm_inferences_after_landmarks_ROI}")
+        # if self.stats:
+        #     print(f"FPS : {self.fps.get_global():.1f} f/s (# frames = {self.fps.nbf})")
+        #     print(f"# frames without body       : {self.nb_frames_no_body}")
+        #     print(f"# pose detection inferences : {self.nb_pd_inferences}")
+        #     print(f"# landmark inferences       : {self.nb_lm_inferences} - # after pose detection: {self.nb_lm_inferences - self.nb_lm_inferences_after_landmarks_ROI} - # after landmarks ROI prediction: {self.nb_lm_inferences_after_landmarks_ROI}")
         
         
            
