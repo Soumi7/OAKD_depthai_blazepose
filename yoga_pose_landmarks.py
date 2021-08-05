@@ -521,6 +521,9 @@ def recognize_pose(r):
         keypoint_json = keypoint_json[:-1] + ']}'
         print(f'LANDMARKS: {keypoint_json}')
 
+        for i in range(0,33):
+                print(KEYPOINT_DICT[i],self.is_present(r,i))
+
         #data = {"pose": pose, "accuracy": rounded_accuracy, "feedback": feedback}
         #print(f"RECOGNIZED: {data}")
 
@@ -542,8 +545,7 @@ while True:
     if frame is None: break
     if body: 
         predicted_pose = recognize_pose(body)
-    for i in range(0,33):
-        print(KEYPOINT_DICT[i],pose.is_present(body,i))
+    
         
 pose.exit()
 
