@@ -521,8 +521,8 @@ def recognize_pose(r):
         keypoint_json = keypoint_json[:-1] + ']}'
         print(f'LANDMARKS: {keypoint_json}')
 
-        for i in range(0,33):
-                print(KEYPOINT_DICT[i],self.is_present(r,i))
+        for key in KEYPOINT_DICT.keys():
+                print(KEYPOINT_DICT[key],self.is_present(r,key))
 
         #data = {"pose": pose, "accuracy": rounded_accuracy, "feedback": feedback}
         #print(f"RECOGNIZED: {data}")
