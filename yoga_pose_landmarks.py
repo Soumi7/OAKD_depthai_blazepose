@@ -543,7 +543,7 @@ while True:
     if body: 
         predicted_pose = recognize_pose(body)
     for i in range(0,33):
-        print(KEYPOINT_DICT[i],body.is_present(i))
+        print(KEYPOINT_DICT[i],pose.is_present(body,i))
         
 pose.exit()
 
