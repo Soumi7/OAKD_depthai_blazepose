@@ -542,6 +542,8 @@ while True:
     if frame is None: break
     if body: 
         predicted_pose = recognize_pose(body)
+    for i in range(0,33):
+        print(KEYPOINT_DICT[i],body.is_present(i))
         
 pose.exit()
 
