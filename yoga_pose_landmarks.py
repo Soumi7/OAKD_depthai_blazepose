@@ -507,7 +507,7 @@ LINE_MESH_UPPER_BODY = [[9, 10], [4, 6], [1, 3],
                         [11, 13], [13, 15], [15, 19], [19, 17], [17, 15]
                         ]
 
-def recognize_pose(r):
+def recognize_pose(pose,r):
         assert r.landmarks.shape == (
             33, 3), 'Unexpected landmarks shape: {}'.format(r.landmarks.shape)
 
@@ -522,7 +522,7 @@ def recognize_pose(r):
         print(f'LANDMARKS: {keypoint_json}')
 
         for key in KEYPOINT_DICT.keys():
-                print(KEYPOINT_DICT[key],self.is_present(r,key))
+                print(KEYPOINT_DICT[key],pose.is_present(r,key))
 
         #data = {"pose": pose, "accuracy": rounded_accuracy, "feedback": feedback}
         #print(f"RECOGNIZED: {data}")
@@ -544,7 +544,7 @@ while True:
     frame, body = pose.next_frame()
     if frame is None: break
     if body: 
-        predicted_pose = recognize_pose(body)
+        predicted_pose = recognize_pose(pose,body)
     
         
 pose.exit()
