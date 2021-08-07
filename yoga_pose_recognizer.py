@@ -1032,6 +1032,15 @@ def recognize_pose(r, expected_pose="mountain", track="beginners"):
 
         r.landmarks = r.landmarks.astype('float32')
 
+        keypoint_json = "{\'landmarks\':["
+
+        for key in KEYPOINT_DICT.keys():
+                coord = r.landmarks[KEYPOINT_DICT[key]]
+                keypoint_json+= f'{{\'name\':\'{key}\',\'x\':{coord[0]},\'y\':{coord[1]}}},'  
+
+        keypoint_json = keypoint_json[:-1] + ']}'
+        print(f'LANDMARKS: {keypoint_json}')
+
         pose_classification = pose_classifier(r.landmarks)
 
         pose_classification_filter = EMADictSmoothing(
