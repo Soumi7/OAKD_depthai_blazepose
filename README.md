@@ -4,6 +4,26 @@ Running Google Mediapipe body pose tracking models on [DepthAI](https://docs.lux
 
 ![Pose demo](img/final.gif)
 
+## Edge mode
+
+Two modes are available: Host and Edge. We have used the Edge mode to reduce the computation on the host device and perform most of the processing on the OAK-D device.
+
+![](img/edge_mode.png)
+
+In the **Edge mode,** the depthai scripting node feature enables the device to run ****most of the processing (neural networks, post-processings, image manipulations). It works only with the device camera but is **definitely the best option when working with the internal camera**. The data exchanged between the host and the device is minimal: the landmarks of detected body (~3kB/frame).
+
+We are using 'rgb_laconic' as input because we don't need the camera video frames on the host (we are just using the landmark data to recreate on the mobile device) and this helps to reduce the computation on the Raspberry Pi significantly.
+
+|Landmark model (Edge mode)| FPS (FPS with 'xyz' option)|
+|-|-|
+|Full|20 (18)|
+|Lite|26 (22)|
+|Heavy|8 (7)|
+
+For depth-capable devices, when measuring the 3D location of a reference point, more nodes are used and not represented here (2 mono cameras, stereo node, spatial location calculator).
+
+
+
 ## Install dependencies
 
 Install the python packages DepthAI, Opencv, open3d with the following command:
